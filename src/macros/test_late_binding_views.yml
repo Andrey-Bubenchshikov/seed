@@ -1,0 +1,5 @@
+version: 2
+macros:
+  - name: test_late_binding_views
+    description: "Macro used to check if Redshift's late binding views were correctly created. 
+    Needed because Redshift can create views with non-existent columns."

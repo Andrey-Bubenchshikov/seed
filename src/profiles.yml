@@ -1,0 +1,33 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host:  "{{ env_var('DB_HOST') }}"
+      user: "{{ env_var('DB_USER') }}"
+      password: "{{ env_var('DB_PASSWORD') }}"
+      port: 5432
+      dbname: "db"
+      schema: "{{ env_var('DEV_SCHEMA')}}"
+      threads: 8
+      keepalives_idle: 0
+    ci:
+      type: postgres
+      host: "{{ env_var('DB_HOST') }}"
+      user: "{{ env_var('DB_USER') }}"
+      password: "{{ env_var('DB_PASSWORD') }}"
+      port: 5432
+      dbname: "db"
+      schema: "{{ env_var('DB_USER') + '_' + env_var('CI_COMMIT_BRANCH') | lower | replace('-', '_') }}"
+      threads: 2
+      keepalives_idle: 0
+    prod:
+      type: postgres
+      host: "{{ env_var('DB_HOST') }}"
+      user: "{{ env_var('DB_PROD_USER') }}"
+      password: "{{ env_var('DB_PROD_PASSWORD') }}"
+      port: 5432
+      dbname: "db"
+      schema: "{{ env_var('PROD_SCHEMA')}}"
+      threads: 8
+      keepalives_idle: 0

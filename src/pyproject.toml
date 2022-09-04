@@ -1,0 +1,11 @@
+[tool.sqlfluff.core]
+templater = "dbt"
+dialect = "postgres"
+[tool.sqlfluff.templater.dbt]
+project_dir = "/src"
+profiles_dir = "/src"
+profile = "default"
+target = "dev"
+
+[tool.doit]
+dep_file = "/tmp/.doit.db"

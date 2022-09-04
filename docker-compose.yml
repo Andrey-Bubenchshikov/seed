@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  postgres:
+    container_name: postgres
+    image: docker-proxy.choco.kz/postgres:14.1-alpine3.15
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    logging:
+      driver: none
+
+  web:
+    container_name: web
+    build: ./
+    env_file:
+      - ./.env
+    volumes:
+      - ./src:/src:rw
+      - ./.env:/src/core/.env
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    environment:
+      PROCESS: DBT_DOCS

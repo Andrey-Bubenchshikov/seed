@@ -1,0 +1,43 @@
+image: docker-proxy.choco.kz/docker:20.10.0
+stages:
+  - containerize
+  - run
+  - lint
+
+include:
+  - project: 'randd/templates/ci'
+    file: 'containerize/docker-build.yml'
+
+variables:
+  POSTGRES_DB: db
+  POSTGRES_USER: user
+  POSTGRES_PASSWORD: pass
+
+.run: &run
+  retry: 2
+  tags:
+    - tests
+  image: ${RELEASE_IMAGE}
+  script:
+    - cp ci_cd/ci/ci.env /src/core/.env && cd /src && bash entrypoint.sh
+
+lint:
+  services:
+    - name: docker-proxy.choco.kz/postgres:14.0-alpine3.14
+      alias: postgres
+  stage: lint
+  variables:
+    PROCESS: LINT
+  <<: *run
+
+run:
+  services:
+    - name: docker-proxy.choco.kz/postgres:14.0-alpine3.14
+      alias: postgres
+  stage: run
+  variables:
+    PROCESS: DBT_ALL
+  <<: *run
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

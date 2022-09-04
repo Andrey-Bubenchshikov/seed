@@ -1,0 +1,4 @@
+version: 2
+macros:
+  - name: drop_target_schema
+    description: "Macro that drops target schema. Called after successful CI run as dbt operation."

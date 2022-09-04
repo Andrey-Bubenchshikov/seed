@@ -1,0 +1,7 @@
+cffi==1.15.0
+cryptography==3.4.8
+
+dbt-core==1.2.1
+dbt-postgres==1.2.1
+
+setuptools==62.1.0

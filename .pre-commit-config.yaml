@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        files: src
+        entry: "docker-compose run --rm web doit lint"
+        language: system
+        pass_filenames: false
+      - id: limit
+        name: limit
+        files: src
+        entry: bash -c "docker compose run -T --rm web python tools/limit.py $(git diff --name-only origin/main)"
+        language: system
+        pass_filenames: false
