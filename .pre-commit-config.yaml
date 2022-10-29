@@ -4,7 +4,7 @@ repos:
       - id: lint
         name: lint
         files: src
-        entry: "docker-compose run --rm web doit lint"
+        entry: "docker compose run --rm web doit lint"
         language: system
         pass_filenames: false
       - id: limit
