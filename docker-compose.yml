@@ -3,7 +3,7 @@ version: '3.7'
 services:
   postgres:
     container_name: postgres
-    image: docker-proxy.choco.kz/postgres:14.1-alpine3.15
+    image: postgres:14.1-alpine3.15
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: user
