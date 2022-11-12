@@ -1,17 +1,14 @@
 image: docker-proxy.choco.kz/docker:20.10.0
 stages:
   - containerize
+  - linter
   - run
-  - lint
 
 include:
   - project: 'randd/templates/ci'
     file: 'containerize/docker-build.yml'
-
-variables:
-  POSTGRES_DB: db
-  POSTGRES_USER: user
-  POSTGRES_PASSWORD: pass
+  - project: 'randd/templates/ci'
+    file: 'deploy/helm.yml'
 
 .run: &run
   retry: 2
@@ -19,25 +16,41 @@ variables:
     - tests
   image: ${RELEASE_IMAGE}
   script:
-    - cp ci_cd/ci/ci.env /src/core/.env && cd /src && bash entrypoint.sh
+    - cd /src && bash entrypoint.sh
 
 lint:
-  services:
-    - name: docker-proxy.choco.kz/postgres:14.0-alpine3.14
-      alias: postgres
-  stage: lint
+  stage: linter
   variables:
     PROCESS: LINT
   <<: *run
-
-run:
-  services:
-    - name: docker-proxy.choco.kz/postgres:14.0-alpine3.14
-      alias: postgres
-  stage: run
-  variables:
-    PROCESS: DBT_ALL
-  <<: *run
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: on_success
+
+ci:
+  stage: run
+  variables:
+    PROCESS: CI
+  <<: *run
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH)
+
+cd:
+  stage: run
+  variables:
+    PROCESS: CD
+  <<: *run
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH)
+
+run:
+  timeout: 3h 30m
+  stage: run
+  variables:
+    PROCESS: RUN
+  <<: *run
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH)
+      when: manual

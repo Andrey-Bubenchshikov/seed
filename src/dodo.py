@@ -3,10 +3,24 @@ from typing import Tuple, Dict, Union
 bandit: str = 'bandit -r . --exclude tests'
 safety: str = 'safety check -i 46499'
 
-sqlfluff = 'sqlfluff lint -vv $(find /src -type f -name "*.sql")'
-sqlfix = 'sqlfluff fix -f -vv $(find /src -type f -name "*.sql")'
+sqlfluff = ' '.join(
+    (
+        'sqlfluff lint',
+        '-v --dialect postgres --processes 8',
+        '.',
+    ),
+)
 
-outdated = 'pip list --outdated --format=columns'
+sqlfix = ' '.join(
+    (
+        'sqlfluff fix',
+        '-v --dialect postgres --processes 8 -f',
+        '.',
+    ),
+)
+
+outdated = 'poetry show --outdated'
+up = 'poetry update && poetryup --latest'
 
 default_verbosity = 2
 
@@ -35,6 +49,10 @@ def task_sqlfluff() -> Dict[str, Union[Tuple, int]]:
 
 def task_sqlfix() -> Dict[str, Union[Tuple, int]]:
     return metadata_from(actions=(sqlfix,))
+
+
+def task_up() -> Dict[str, Union[Tuple, int]]:
+    return metadata_from(actions=(up,))
 
 
 def task_lint() -> Dict[str, Union[Tuple, int]]:
